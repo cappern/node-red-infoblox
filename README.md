@@ -1,4 +1,4 @@
-@cappern/node-red-infoblox
+@cappern/node-red-infoblox [![CI](https://github.com/cappern/node-red-infoblox/actions/workflows/ci.yml/badge.svg)](https://github.com/cappern/node-red-infoblox/actions/workflows/ci.yml)
 
 Node-RED nodes for interacting with Infoblox DDI via the Web API (WAPI).
 
