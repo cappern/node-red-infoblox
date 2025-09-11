@@ -12,6 +12,10 @@
     "type": "git",
     "url": "https://github.com/cappern/node-red-infoblox.git"
   },
+  "files": [
+    "nodes",
+    "index.js"
+  ],
   "keywords": [
     "node-red",
     "node-red-node",
