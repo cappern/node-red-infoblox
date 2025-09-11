@@ -1,71 +1,117 @@
-@cappern/node-red-infoblox
+# @cappern/node-red-infoblox
+
+[![CI](https://github.com/cappern/node-red-infoblox/actions/workflows/ci.yml/badge.svg)](https://github.com/cappern/node-red-infoblox/actions/workflows/ci.yml)
 
 Node-RED nodes for interacting with Infoblox DDI via the Web API (WAPI).
 
-Features
-- Infoblox config node with TLS and timeout settings
+## Table of Contents
+- Features
+- Installation
+- Quick Start
+- Nodes Overview
+- Usage Examples
+- Status & Errors
+- Security
+- Troubleshooting
+- Development
+- Legal / Branding
+
+## Features
+- Infoblox config node with TLS, custom CA and timeout settings
 - Generic request node for any WAPI resource
-- Host-focused CRUD node for <code>record:host</code>
+- Host-focused CRUD node for `record:host`
 - Clear Node-RED editor help and examples
 
-Nodes
-- Infoblox (config): Connection settings and credentials.
-- Infoblox Request: Make WAPI calls to resources like <code>record:a</code>, <code>network</code>, <code>fixedaddress</code>.
-- Infoblox Host: Focused CRUD for <code>record:host</code> (create/read/update/delete).
+## Installation
+1) In your Node-RED user directory, install the package:
 
-Install
-1) In your Node-RED user directory run: <code>npm install @cappern/node-red-infoblox</code>
-2) Restart Node-RED
+```bash
+npm install @cappern/node-red-infoblox
+```
 
-Quick Start
+2) Restart Node-RED and find the nodes in the palette under “Infoblox”.
+
+## Quick Start
 1) Add an Infoblox config node and set:
-   - Base URL: e.g. <code>https://grid-master</code>
-   - WAPI Version: e.g. <code>2.12</code>
+   - Base URL: e.g. `https://grid-master`
+   - WAPI Version: e.g. `2.12`
    - Credentials: username/password (Basic auth)
    - Verify TLS: uncheck for self-signed lab certs
    - CA Certificate (PEM): paste a custom CA/bundle to trust Infoblox without disabling verification
    - Timeout: defaults to 30000 ms
-2) Add an Infoblox Request or Infoblox Host node and select the config
-3) Deploy and test with an Inject → Debug flow
+2) Add an Infoblox Request or Infoblox Host node and select the config.
+3) Deploy and test with an Inject → Debug flow.
 
-Message Properties
-- msg.resource: string path (e.g. <code>record:a</code>)
-- msg.method: GET | POST | PUT | PATCH | DELETE
-- msg.query: object or query string (e.g. <code>{ name: "host.example.com" }</code>)
-- msg.payload: object for write operations
+## Nodes Overview
+- Infoblox (config): connection settings and credentials shared by the nodes.
+- Infoblox Request: call WAPI resources like `record:a`, `network`, `fixedaddress`.
+- Infoblox Host: simplified CRUD for `record:host` (create/read/update/delete).
 
-Outputs
-- msg.payload: parsed JSON response (or text on non‑JSON)
-- msg.statusCode, msg.headers: response metadata
+### Message properties
+- `msg.resource`: string path (e.g. `record:a`)
+- `msg.method`: `GET | POST | PUT | PATCH | DELETE`
+- `msg.query`: object or query string (e.g. `{ name: "host.example.com" }`)
+- `msg.payload`: object for write operations
 
-Examples
-- List A records by name (Request node):
-  - Resource: <code>record:a</code>
-  - msg.query: <code>{ name: "host.example.com" }</code>
-- Create A record (Request node):
-  - Method: POST
-  - Resource: <code>record:a</code>
-  - msg.payload: <code>{ name: "host.example.com", ipv4addr: "192.0.2.10" }</code>
+### Outputs
+- `msg.payload`: parsed JSON response (or text on non‑JSON)
+- `msg.statusCode`, `msg.headers`: response metadata
 
-- Host: Create host record
-  - Node: Infoblox Host (Operation: Create)
-  - msg.payload: <code>{ "name": "host.example.com", "ipv4addrs": [{ "ipv4addr": "192.0.2.10" }] }</code>
+## Usage Examples
 
-- Host: Read by name
-  - Node: Infoblox Host (Operation: Read, Hostname: <code>host.example.com</code>)
-  - Or pass <code>msg.query = { name: "host.example.com" }</code>
+### Request node
+- List A records by name
 
-- Host: Update by _ref
-  - Node: Infoblox Host (Operation: Update, Ref: <code>_ref-from-read</code>)
-  - msg.payload: fields to modify, e.g. <code>{ "comment": "updated via Node-RED" }</code>
+```js
+msg.resource = "record:a";
+msg.query = { name: "host.example.com" };
+return msg;
+```
 
-- Host: Delete by _ref
-  - Node: Infoblox Host (Operation: Delete, Ref: <code>_ref-from-read</code>)
+- Create an A record
 
-Example Flows
-Import these via Node-RED → menu → Import → Clipboard.
+```js
+msg.method = "POST";
+msg.resource = "record:a";
+msg.payload = { name: "host.example.com", ipv4addr: "192.0.2.10" };
+return msg;
+```
 
-Request: List A records by name
+### Host node
+- Create host record
+
+```js
+msg.operation = "create";
+msg.payload = {
+  name: "host.example.com",
+  ipv4addrs: [{ ipv4addr: "192.0.2.10" }]
+};
+return msg;
+```
+
+- Read by name
+
+```js
+msg.operation = "read";
+msg.hostname = "host.example.com";
+return msg;
+```
+
+- Update by _ref
+
+```js
+msg.operation = "update";
+msg.ref = "record:host/ZG5zLmhvc3Qk...:host.example.com/default";
+msg.payload = { comment: "updated via Node-RED" };
+return msg;
+```
+
+### Importable example flows
+Import via Node-RED → menu → Import → Clipboard.
+
+<details>
+<summary>Request: List A records by name (JSON)</summary>
+
 ```json
 [
   {
@@ -91,7 +137,11 @@ Request: List A records by name
 ]
 ```
 
-Host: Create and then read by name
+</details>
+
+<details>
+<summary>Host: Create and then read by name (JSON)</summary>
+
 ```json
 [
   { "id": "conf2", "type": "infoblox-config", "name": "Infoblox", "baseUrl": "https://grid-master", "wapiVersion": "2.12", "timeoutMs": 30000, "sslVerify": true },
@@ -109,25 +159,27 @@ Host: Create and then read by name
 ]
 ```
 
-Status & Errors
-- Nodes show blue while sending, green on success, red on error or timeout
-- On error, the node passes response info and sets <code>msg.statusCode</code> and <code>msg.payload</code> for inspection
+</details>
 
-Security Notes
-- Credentials are stored using Node-RED’s credential system
-- Prefer adding a <b>CA Certificate (PEM)</b> to trust your Infoblox cert; disable <b>Verify TLS</b> only for labs/testing
+## Status & Errors
+- Nodes show blue while sending, green on success, red on error or timeout.
+- On error, the node passes response info and sets `msg.statusCode` and `msg.payload` for inspection.
 
-Troubleshooting
-- 401/403: Check credentials and Infoblox roles/permissions
-- 404: Verify resource name (e.g. <code>record:a</code>) or <code>_ref</code>
-- 422/400: Validate payload fields against WAPI schema
-- Timeout: Increase timeout in config or check connectivity/Certs
+## Security
+- Credentials are stored using Node-RED’s credential system.
+- Prefer adding a CA Certificate (PEM) to trust your Infoblox cert; disable “Verify TLS” only for labs/testing.
 
-Development
-- Requires Node.js 20+ (uses global <code>fetch</code>)
-- Run tests: <code>npm test</code>, Coverage: <code>npm run coverage</code>
+## Troubleshooting
+- 401/403: check credentials and Infoblox roles/permissions
+- 404: verify resource name (e.g. `record:a`) or `_ref`
+- 422/400: validate payload fields against WAPI schema
+- Timeout: increase timeout in config or check connectivity/certs
 
-Legal / Branding
+## Development
+- Requires Node.js 20+ (uses global `fetch`)
+- Run tests: `npm test`  |  Coverage: `npm run coverage`
+
+## Legal / Branding
 - Unofficial project: not affiliated with or endorsed by Infoblox Inc.
 - “Infoblox” is a trademark of its respective owner. Any references are for identification and interoperability only (nominative use).
 - No Infoblox logos or proprietary artwork are included; the nodes appear under a neutral “Infoblox” palette group with generic icons.
