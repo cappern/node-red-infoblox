@@ -1,6 +1,6 @@
 {
   "name": "@cappern/node-red-infoblox",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node-RED nodes for Infoblox DDI (WAPI) integration.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "__REPO_URL__"
+    "url": "https://github.com/cappern/node-red-infoblox.git"
   },
   "keywords": [
     "node-red",
@@ -25,9 +25,9 @@
   "author": "",
   "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "__REPO_ISSUES_URL__"
+    "url": "https://github.com/cappern/node-red-infoblox/issues"
   },
-  "homepage": "__HOMEPAGE_URL__",
+  "homepage": "https://github.com/cappern/node-red-infoblox",
   "node-red": {
     "version": ">=2.0.0",
     "nodes": {
