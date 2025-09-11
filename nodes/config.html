@@ -1,0 +1,79 @@
+<script type="text/x-red" data-template-name="infoblox-config">
+  <div class="form-row">
+    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-config-input-name" placeholder="Optional label">
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-baseUrl"><i class="fa fa-link"></i> Base URL</label>
+    <input type="text" id="node-config-input-baseUrl" placeholder="https://grid.example.com">
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-wapiVersion"><i class="fa fa-code"></i> WAPI Version</label>
+    <input type="text" id="node-config-input-wapiVersion" placeholder="e.g. 2.12" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-username"><i class="fa fa-user"></i> Username</label>
+    <input type="text" id="node-config-input-username" placeholder="Infoblox username">
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
+    <input type="password" id="node-config-input-password" placeholder="Password">
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-timeoutMs"><i class="fa fa-clock-o"></i> Timeout (ms)</label>
+    <input type="number" id="node-config-input-timeoutMs" min="1000" step="500" placeholder="30000">
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-sslVerify"><i class="fa fa-shield"></i> Verify TLS</label>
+    <input type="checkbox" id="node-config-input-sslVerify" style="width:auto; vertical-align:middle;">
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-caCert"><i class="fa fa-certificate"></i> CA Certificate (PEM)</label>
+    <textarea id="node-config-input-caCert" rows="6" style="width:100%;" placeholder="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"></textarea>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="infoblox-config">
+  <p>Infoblox DDI connection settings shared by the Infoblox nodes.</p>
+  <p><i>Disclaimer: This is an independent, community-maintained node and is not affiliated with or endorsed by Infoblox.</i></p>
+  <ul>
+    <li><b>Base URL</b>: Grid host, e.g. <code>https://grid-master</code> (no trailing slash).</li>
+    <li><b>WAPI Version</b>: API version (e.g. <code>2.12</code>), combined as <code>{base}/wapi/v{version}</code>.</li>
+    <li><b>Credentials</b>: Username and password for Basic Auth, stored as Node‑RED credentials.</li>
+    <li><b>Timeout (ms)</b>: Request timeout, default <code>30000</code>.</li>
+    <li><b>Verify TLS</b>: Uncheck to allow self‑signed certs (lab/test only).</li>
+    <li><b>CA Certificate (PEM)</b>: Paste a custom CA bundle to trust your Infoblox certificate without disabling TLS verification.</li>
+  </ul>
+  <p>Tip: You can reference this config from multiple Infoblox nodes in your flows.</p>
+</script>
+
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("infoblox-config", {
+      category: "config",
+      defaults: {
+        name: { value: "" },
+        baseUrl: { value: "", required: true },
+        wapiVersion: { value: "2.12", required: true },
+        timeoutMs: { value: 30000 },
+        sslVerify: { value: true }
+      },
+      credentials: {
+        username: { type: "text" },
+        password: { type: "password" },
+        caCert: { type: "text" }
+      },
+      label: function () {
+        const host = this.baseUrl || "Infoblox";
+        return this.name || host;
+      }
+    });
+  })();
+  </script>

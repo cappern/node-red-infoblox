@@ -1,0 +1,113 @@
+<script type="text/x-red" data-template-name="infoblox-host">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Optional label">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-infoblox"><i class="fa fa-cog"></i> Config</label>
+    <input type="text" id="node-input-infoblox">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-operation"><i class="fa fa-exchange"></i> Operation</label>
+    <select id="node-input-operation">
+      <option value="read">Read</option>
+      <option value="create">Create</option>
+      <option value="update">Update</option>
+      <option value="delete">Delete</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-hostname"><i class="fa fa-server"></i> Hostname</label>
+    <input type="text" id="node-input-hostname" placeholder="Used for Read when no Ref">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-ref"><i class="fa fa-link"></i> Ref</label>
+    <input type="text" id="node-input-ref" placeholder="_ref for update/delete/read">
+  </div>
+
+  <div class="form-tips">
+    - Create/Update use <code>msg.payload</code> for body.<br />
+    - Read by <b>Ref</b> if set; otherwise queries <code>record:host</code>, optional <code>Hostname</code> or <code>msg.query</code>.<br />
+    - Delete requires <code>Ref</code>.
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="infoblox-host">
+  <p><b>Infoblox Host</b></p>
+  <p>CRUD operations for <code>record:host</code> via Infoblox WAPI. Choose the operation and optionally provide a Hostname (for <i>Read</i>) or a <code>_ref</code> (for <i>Read by ref</i>, <i>Update</i>, <i>Delete</i>).</p>
+  <p><i>Disclaimer: This is an independent, community-maintained node and is not affiliated with or endorsed by Infoblox.</i></p>
+  <h3>Inputs</h3>
+  <ul>
+    <li><code>msg.operation</code> (string): <code>create</code> | <code>read</code> | <code>update</code> | <code>delete</code>. Overrides the node field.</li>
+    <li><code>msg.ref</code> (string): Object reference (<code>_ref</code>) for read-by-ref, update, delete.</li>
+    <li><code>msg.hostname</code> (string): Hostname used for read when no <code>_ref</code> is supplied.</li>
+    <li><code>msg.query</code> (object|string): Additional query parameters for read; merged with Hostname when provided.</li>
+    <li><code>msg.payload</code> (object): Body for create/update (only the fields you want to change for update).</li>
+  </ul>
+  <h3>Outputs</h3>
+  <ul>
+    <li><code>msg.payload</code>: Parsed JSON response (or text if not JSON).</li>
+    <li><code>msg.statusCode</code>, <code>msg.headers</code>: Response metadata.</li>
+  </ul>
+  <h3>Notes</h3>
+  <ul>
+    <li>Read by <b>Ref</b> when set; otherwise queries <code>record:host</code>.</li>
+    <li>For create, supply a valid host body (e.g. <code>{ name, ipv4addrs: [{ ipv4addr }] }</code>).</li>
+    <li>For update, provide only the fields you wish to change in <code>msg.payload</code>. Default method is PUT; set <code>msg.method = "PATCH"</code> to patch.</li>
+  </ul>
+  <h3>Examples</h3>
+  <p><b>Create Host</b></p>
+<pre>
+msg.operation = "create";
+msg.payload = {
+  name: "host.example.com",
+  ipv4addrs: [{ ipv4addr: "192.0.2.10" }]
+};
+return msg;
+</pre>
+  <p><b>Read Host by name</b></p>
+<pre>
+msg.operation = "read";
+msg.hostname = "host.example.com";
+return msg;
+</pre>
+  <p><b>Update Host comment by _ref</b></p>
+<pre>
+msg.operation = "update";
+msg.ref = "record:host/ZG5zLmhvc3Qk...:host.example.com/default";
+msg.payload = { comment: "updated via Node-RED" };
+return msg;
+</pre>
+  <p><b>Delete Host by _ref</b></p>
+<pre>
+msg.operation = "delete";
+msg.ref = "record:host/ZG5zLmhvc3Qk...";
+return msg;
+</pre>
+  </ul>
+</script>
+
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("infoblox-host", {
+      category: "infoblox",
+      color: "#B5E3F2",
+      defaults: {
+        name: { value: "" },
+        infoblox: { type: "infoblox-config", required: true },
+        operation: { value: "read" },
+        hostname: { value: "" },
+        ref: { value: "" }
+      },
+      inputs: 1,
+      outputs: 1,
+      icon: "font-awesome/fa-server",
+      label: function () { return this.name || "Infoblox Host"; },
+      paletteLabel: "Infoblox Host"
+    });
+  })();
+  </script>

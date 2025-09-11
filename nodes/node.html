@@ -1,0 +1,88 @@
+<script type="text/x-red" data-template-name="infoblox-request">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Optional label">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-infoblox"><i class="fa fa-cog"></i> Config</label>
+    <input type="text" id="node-input-infoblox">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-resource"><i class="fa fa-database"></i> Resource</label>
+    <input type="text" id="node-input-resource" placeholder="e.g. record:a, network, fixedaddress">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-method"><i class="fa fa-exchange"></i> Method</label>
+    <select id="node-input-method">
+      <option value="GET">GET</option>
+      <option value="POST">POST</option>
+      <option value="PUT">PUT</option>
+      <option value="PATCH">PATCH</option>
+      <option value="DELETE">DELETE</option>
+    </select>
+  </div>
+
+  <div class="form-tips">Use <code>msg.query</code> for query params and <code>msg.payload</code> as request body for write operations.</div>
+</script>
+
+<script type="text/x-red" data-help-name="infoblox-request">
+  <p><b>Infoblox Request</b></p>
+  <p>Call Infoblox WAPI resources (e.g. <code>record:a</code>, <code>network</code>, <code>fixedaddress</code>) using an <b>Infoblox</b> config node for connection and credentials.</p>
+  <p><i>Disclaimer: This is an independent, community-maintained node and is not affiliated with or endorsed by Infoblox.</i></p>
+  <h3>Inputs</h3>
+  <ul>
+    <li><code>msg.resource</code> (string): Resource path (e.g. <code>record:a</code>). Overrides the node field.</li>
+    <li><code>msg.method</code> (string): GET | POST | PUT | PATCH | DELETE. Overrides the node field.</li>
+    <li><code>msg.query</code> (object|string): Query parameters or raw query string. Arrays are supported for repeated params.</li>
+    <li><code>msg.payload</code> (object): JSON body for write operations (POST/PUT/PATCH).</li>
+  </ul>
+  <h3>Outputs</h3>
+  <ul>
+    <li><code>msg.payload</code>: Parsed JSON response (or text if non‑JSON).</li>
+    <li><code>msg.statusCode</code>, <code>msg.headers</code>: Response metadata.</li>
+  </ul>
+  <h3>Behavior</h3>
+  <ul>
+    <li>Builds URL as <code>{baseUrl}/wapi/v{version}/{resource}?{query}</code>.</li>
+    <li>Basic Auth is derived from the config node credentials.</li>
+    <li>Timeout is controlled by the config node (default 30s).</li>
+    <li>If <b>Verify TLS</b> is disabled in the config, TLS verification is skipped (use only for labs).</li>
+  </ul>
+  <h3>Examples</h3>
+  <p><b>Read A records by name</b></p>
+<pre>
+msg.resource = "record:a";
+msg.query = { name: "host.example.com" };
+return msg;
+</pre>
+  <p><b>Create A record</b></p>
+<pre>
+msg.method = "POST";
+msg.resource = "record:a";
+msg.payload = { name: "host.example.com", ipv4addr: "192.0.2.10" };
+return msg;
+</pre>
+</script>
+
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("infoblox-request", {
+      category: "infoblox",
+      color: "#B5E3F2",
+      defaults: {
+        name: { value: "" },
+        infoblox: { type: "infoblox-config", required: true },
+        resource: { value: "" },
+        method: { value: "GET" }
+      },
+      inputs: 1,
+      outputs: 1,
+      icon: "font-awesome/fa-server",
+      label: function () { return this.name || "Infoblox Request"; },
+      paletteLabel: "Infoblox Request"
+    });
+  })();
+  </script>
