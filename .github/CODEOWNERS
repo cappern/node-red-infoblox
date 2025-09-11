@@ -1,0 +1,9 @@
+# CODEOWNERS
+# Adjust to your GitHub user/team as needed.
+
+# Default owners for everything in the repo
+* @cappern
+
+# Example: assign workflows to a team
+# .github/workflows/ @cappern/maintainers
+
