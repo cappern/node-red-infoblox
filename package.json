@@ -44,7 +44,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "undici": "^7.16.0"
+    "undici": "^8.1.0"
   },
   "devDependencies": {
     "chai": "^6.0.1",
